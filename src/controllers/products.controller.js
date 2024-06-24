@@ -1,7 +1,6 @@
-import { isInvalidUser } from '../utils/index.js';
-import UserDTO from '../dto/user.dto.js';
+import { isInvalidProduct } from "../utils/index.js";
 
-export const getUsers = async (req, res) => {
+export const getProducts = async (req, res) => {
   try {
     // Connect
     req.getConnection((err, conn) => {
@@ -9,15 +8,15 @@ export const getUsers = async (req, res) => {
         return res.status(500).json({ status: 'Error', error: err.message });
 
       // Search all
-      conn.query('SELECT * FROM users', (err, users) => {
+      conn.query('SELECT * FROM products', (err, products) => {
         if (err)
           return res.status(500).json({ status: 'Error', error: err.message });
 
-        if (users.length === 0)
-          return res.status(404).json({ status: 'Error', error: 'Users not found' });
+        if (products.length === 0)
+          return res.status(404).json({ status: 'Error', error: 'Products not found' });
 
-        // Send users
-        return res.status(200).json({ status: 'Success', users });
+        // Send products
+        return res.status(200).json({ status: 'Success', products });
       });
     });
   } catch (err) {
@@ -25,7 +24,7 @@ export const getUsers = async (req, res) => {
   }
 };
 
-export const getUser = async (req, res) => {
+export const getProduct = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -36,17 +35,17 @@ export const getUser = async (req, res) => {
 
       // Search by ID
       conn.query(
-        'SELECT * FROM users WHERE users.user_id = ?',
+        'SELECT * FROM products WHERE products.product_id = ?',
         [id],
-        (err, user) => {
+        (err, product) => {
           if (err)
             return res.status(500).json({ status: 'Error', error: err.message });
 
-          if (user.length === 0)
-            return res.status(404).json({ status: 'Error', error: 'User not found' });
+          if (product.length === 0)
+            return res.status(404).json({ status: 'Error', error: 'Product not found' });
 
-          // Send user
-          return res.status(200).json({ status: 'Success', user });
+          // Send product
+          return res.status(200).json({ status: 'Success', product });
         },
       );
     });
@@ -55,13 +54,38 @@ export const getUser = async (req, res) => {
   }
 };
 
-export const updateUser = async (req, res) => {
+export const createProduct = async (req, res) => {
   try {
-    // Get, validate and transform data
+    // Get and validate data
+    const product = req.body;
+    if (isInvalidProduct(product))
+      return res.status(400).json({ status: 'Error', error: 'Incorrect data submitted' });
+
+    // Connect
+    req.getConnection((err, conn) => {
+      if (err)
+        return res.status(500).json({ status: 'Error', error: err.message });
+
+      // Create product
+      conn.query('INSERT INTO products SET ?', [product], (err, result) => {
+        if (err)
+          return res.status(500).json({ status: 'Error', error: err.message });
+
+        return res.status(200).json({ status: 'Success', message: 'Create successful', product_id: result.insertId });
+      });
+
+    });
+  } catch (err) {
+    return res.status(500).json({ status: 'Error', error: err.message });
+  }
+};
+
+export const updateProduct = async (req, res) => {
+  try {
+    // Get and validate data
     const { id } = req.params;
-    const user = req.body;
-		const newUser = new UserDTO(user);
-    if (isInvalidUser(user))
+    const product = req.body;
+    if (isInvalidProduct(product))
       return res.status(400).json({ status: 'Error', error: 'Incorrect data submitted' });
 
     // Connect
@@ -71,19 +95,19 @@ export const updateUser = async (req, res) => {
 
       // Search by ID
       conn.query(
-        'SELECT * FROM users WHERE users.user_id = ?',
+        'SELECT * FROM products WHERE products.product_id = ?',
         [id],
         async (err, user) => {
           if (err)
             return res.status(500).json({ status: 'Error', error: err.message });
           
 					if (user.length === 0)
-            return res.status(404).json({ status: 'Error', error: 'User not found' });
+            return res.status(404).json({ status: 'Error', error: 'Product not found' });
 
-          // Update user
+          // Update product
           conn.query(
-            'UPDATE users SET ? WHERE users.user_id = ?',
-            [newUser, id],
+            'UPDATE products SET ? WHERE products.product_id = ?',
+            [product, id],
             (err, result) => {
               if (err)
                 return res.status(500).json({ status: 'Error', error: err.message });
@@ -100,7 +124,7 @@ export const updateUser = async (req, res) => {
   }
 };
 
-export const deleteUser = async (req, res) => {
+export const deleteProduct = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -111,18 +135,18 @@ export const deleteUser = async (req, res) => {
 
       // Search by ID
       conn.query(
-        'SELECT * FROM users WHERE users.user_id = ?',
+        'SELECT * FROM products WHERE products.product_id = ?',
         [id],
-        async (err, user) => {
+        async (err, product) => {
           if (err)
             return res.status(500).json({ status: 'Error', error: err.message });
 					
-					if (user.length === 0)
-            return res.status(404).json({ status: 'Error', error: 'User not found' });
+					if (product.length === 0)
+            return res.status(404).json({ status: 'Error', error: 'Product not found' });
 
-          // Delete user
+          // Delete product
           conn.query(
-						'DELETE FROM users WHERE users.user_id = ?',
+						'DELETE FROM products WHERE products.product_id = ?',
 						[id],
 						(err, results) => {
               if (err)

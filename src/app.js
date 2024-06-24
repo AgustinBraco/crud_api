@@ -1,34 +1,35 @@
-// Imports
-import './config/env.config.js';
-import router from './routes/router.js'
+import './config/environment.js';
+import database from './db/database.js';
+import router from './router.js';
 import express from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
-import mysql from 'mysql';
-import myConnection from 'express-myconnection';
+import bodyParser from 'body-parser';
 
-// App
+import session from 'express-session';
+
 const app = express();
 const PORT = app.set('port', process.env.PORT || 3000).settings.port;
 
 // Middlewares
+app.use(cors());
+app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(morgan('dev'));
-app.use(cors());
+app.use(bodyParser.json());
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { maxAge: 3600000 },
+  }),
+);
 
-// MySQL
-app.use(myConnection(mysql, {
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  port: '3306',
-  database: 'crud'
-}, 'single'));
+database(app);
+router(app);
 
-// Server
+// Start
 app.listen(PORT, () => {
   console.log(`Server running on ${PORT}`);
 });
-
-router(app);

@@ -1,8 +1,8 @@
 # CRUD
 En este repositorio se encuentra el desarrollo de un CRUD en una API. <br> 
-La herramienta expone un endpoint para cada operación (con validación de permisos por rol) <br>
-que permite crear, leer, actualizar y borrar registros en una base de datos relacional <br>
-a través de query de SQL (MySQL).
+La herramienta expone endpoints para cada operación (con validación de permisos por rol) <br>
+los cuales permiten crear, leer, actualizar y borrar registros en una base de datos relacional <br>
+a través de querys de SQL (MySQL).
 
 ## Tecnologías
 <div>

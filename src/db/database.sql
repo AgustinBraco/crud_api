@@ -1,0 +1,27 @@
+-- Database
+CREATE DATABASE crud;
+DROP DATABASE crud;
+USE crud;
+
+-- Tables
+-- Users
+CREATE TABLE IF NOT EXISTS users (
+	user_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	email VARCHAR(255) NOT NULL,
+	password VARCHAR(255) NOT NULL,
+	permission VARCHAR(5) NOT NULL
+);
+DROP TABLE users;
+TRUNCATE users;
+SELECT * FROM users;
+
+-- Products
+CREATE TABLE IF NOT EXISTS products (
+	product_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	name VARCHAR(255) NOT NULL,
+	price INT(6) NOT NULL,
+	stock INT(5) NOT NULL
+);
+DROP TABLE products;
+TRUNCATE products;
+SELECT * FROM products;
